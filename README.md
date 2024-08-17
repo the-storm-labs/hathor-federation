@@ -136,18 +136,6 @@ npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/Federattion.js
 ```
 
-### Deploying the Contract
-
-Deploy the contract with an initial set of federation members and an owner:
-
-```solidity
-const HathorFederation = artifacts.require("HathorFederation");
-
-module.exports = function(deployer) {
-    deployer.deploy(HathorFederation, ["0xAddress1", "0xAddress2"], "0xOwnerAddress");
-};
-```
-
 ### Proposing a Transaction
 
 Once deployed, a member can propose a transaction by calling the `sendTransactionProposal` function.
@@ -165,4 +153,3 @@ Once all necessary signatures are collected, the transaction can be processed by
 This project is licensed under the MIT License.
 ```
 
-This README file now includes instructions for running the Hardhat tasks as part of a sample project setup.
