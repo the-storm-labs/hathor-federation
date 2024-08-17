@@ -35,6 +35,7 @@ The `HathorFederation` smart contract is designed to manage a decentralized fede
 
 - `onlyMember`: Ensures that the caller is a member of the federation.
 
+
 ### Functions
 
 #### Constructor
