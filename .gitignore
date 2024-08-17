@@ -1,8 +1,5 @@
 node_modules
-infura.key
-mnemonic.key
-etherscan.key
-**/**.key
+*.key
 
 # Hardhat files
 /cache
