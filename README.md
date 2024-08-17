@@ -38,12 +38,15 @@ The `HathorFederation` smart contract is designed to manage a decentralized fede
 
 ### Functions
 
+
 #### Constructor
 
-```solidity
-constructor(address[] memory _members, address owner)
-```
-Initializes the contract with a list of members and an owner.
+- **constructor**: Crestes the contract.
+
+ ```solidity
+ constructor(address[] memory _members, address owner)
+ ```
+ Initializes the contract with a list of members and an owner.
 
 #### Transaction Management
 
