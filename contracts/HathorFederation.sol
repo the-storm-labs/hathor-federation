@@ -32,7 +32,7 @@ contract HathorFederation is Ownable {
     enum TransactionType {
         MELT,
         MINT,
-        TRNASFER,
+        TRANSFER,
         RETURN
     }
 
