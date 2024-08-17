@@ -1,8 +1,8 @@
 node_modules
-.env
 infura.key
 mnemonic.key
 etherscan.key
+**/**.key
 
 # Hardhat files
 /cache
