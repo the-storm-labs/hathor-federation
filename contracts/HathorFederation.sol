@@ -4,14 +4,13 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 contract HathorFederation is Ownable {
     address private constant NULL_ADDRESS = address(0);
     uint public constant MAX_MEMBER_COUNT = 50;
 
     address[] public members;
 
-    struct Signatures {      
+    struct Signatures {
         bytes signature;
     }
 
@@ -24,10 +23,9 @@ contract HathorFederation is Ownable {
 
     mapping(bytes32 => mapping(address => bool)) public isSigned;
     mapping(bytes32 => bool) public isProcessed;
-    mapping (bytes32 => bool) public isProposed;
-    mapping (bytes32 => bytes) public transactionHex;
-    mapping (bytes32 => Signatures[] ) public transactionSignatures;
-
+    mapping(bytes32 => bool) public isProposed;
+    mapping(bytes32 => bytes) public transactionHex;
+    mapping(bytes32 => Signatures[]) public transactionSignatures;
 
     enum TransactionType {
         MELT,
@@ -49,18 +47,17 @@ contract HathorFederation is Ownable {
     );
 
     event ProposalSent(bytes32 indexed transactionId, bool processed);
-    event TransactionProposed(bytes32 transactionId, bytes32 originalTransactionHash, bytes txHex);
-
+    event TransactionProposed(
+        bytes32 transactionId,
+        bytes32 originalTransactionHash,
+        bytes txHex
+    );
 
     event MemberAddition(address indexed member);
     event MemberRemoval(address indexed member);
 
-    constructor(
-        address[] memory _members,
-        address owner
-    )  Ownable(owner) {
-    
-       require(
+    constructor(address[] memory _members, address owner) Ownable(owner) {
+        require(
             _members.length <= MAX_MEMBER_COUNT,
             "HathorFederation: Too many members"
         );
@@ -75,16 +72,14 @@ contract HathorFederation is Ownable {
         }
     }
 
-
     function getTransactionId(
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
         bytes32 sender,
         bytes32 receiver,
-        TransactionType transactionType      
-    ) external  pure returns(bytes32){
-
+        TransactionType transactionType
+    ) external pure returns (bytes32) {
         bytes32 transactionId = keccak256(
             abi.encodePacked(
                 originalTokenAddress,
@@ -99,16 +94,15 @@ contract HathorFederation is Ownable {
         return transactionId;
     }
 
-
-    function sendTransactionProposal( bytes32 originalTokenAddress,
+    function sendTransactionProposal(
+        bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
         bytes32 sender,
         bytes32 receiver,
         TransactionType transactionType,
-        bytes memory txHex) external onlyMember{
-       
-
+        bytes memory txHex
+    ) external onlyMember {
         bytes32 transactionId = keccak256(
             abi.encodePacked(
                 originalTokenAddress,
@@ -120,12 +114,14 @@ contract HathorFederation is Ownable {
             )
         );
 
-        require(isProposed[transactionId] == false, "HathorFederation: already proposed");
+        require(
+            isProposed[transactionId] == false,
+            "HathorFederation: already proposed"
+        );
         transactionHex[transactionId] = txHex;
         isProposed[transactionId] = true;
         emit TransactionProposed(transactionId, transactionHash, txHex);
     }
-
 
     function updateSignatureState(
         bytes32 originalTokenAddress,
@@ -188,7 +184,10 @@ contract HathorFederation is Ownable {
 
     function addMember(address _newMember) external onlyOwner {
         require(_newMember != NULL_ADDRESS, "HathorFederation: Empty member");
-        require(!isMember[_newMember], "HathorFederation: Member already exists");
+        require(
+            !isMember[_newMember],
+            "HathorFederation: Member already exists"
+        );
 
         isMember[_newMember] = true;
         members.push(_newMember);
@@ -197,8 +196,14 @@ contract HathorFederation is Ownable {
 
     function removeMember(address _oldMember) external onlyOwner {
         require(_oldMember != NULL_ADDRESS, "HathorFederation: Empty member");
-        require(isMember[_oldMember], "HathorFederation: Member doesn't exists");
-        require(members.length > 1, "HathorFederation: Can't remove all the members");
+        require(
+            isMember[_oldMember],
+            "HathorFederation: Member doesn't exists"
+        );
+        require(
+            members.length > 1,
+            "HathorFederation: Can't remove all the members"
+        );
 
         isMember[_oldMember] = false;
         for (uint i = 0; i < members.length - 1; i++) {
@@ -217,5 +222,11 @@ contract HathorFederation is Ownable {
 		*/
     function getMembers() external view returns (address[] memory) {
         return members;
+    }
+
+    function getSignatureCount(
+        bytes32 transactionId
+    ) external view returns (uint256) {
+        return transactionSignatures[transactionId].length;
     }
 }

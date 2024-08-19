@@ -215,14 +215,19 @@ describe("HathorFederation Contract", function () {
 
             expect(await hathorFederation.isSigned(txId, member2.address)).to.be.true;
 
-
+            // Retrieve the length of the transactionSignatures array
+            const signatureCount = await hathorFederation.getSignatureCount(txId);
+            
+            // Log the length to the console
+            console.log("Number of Signatures:", signatureCount.toString());
+            expect(signatureCount).to.equal(2);            
+                        
             const signatureStruct1 = await hathorFederation.transactionSignatures(txId, 0);
-            const signatureStruct2 = await hathorFederation.transactionSignatures(txId, 1);
+            const signatureStruct2 = await hathorFederation.transactionSignatures(txId, 1);              
 
             // Log the signatures to the console
             console.log("Signature 1:", signatureStruct1);
             console.log("Signature 2:", signatureStruct2);
-
 
             expect(signatureStruct1).to.equal(signature1);
             expect(signatureStruct2).to.equal(signature2);
