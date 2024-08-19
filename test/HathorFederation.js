@@ -26,7 +26,7 @@ describe("HathorFederation Contract", function () {
             expect(await hathorFederation.isMember(member1.address)).to.be.true;
             expect(await hathorFederation.isMember(member2.address)).to.be.true;
             expect(await hathorFederation.isMember(nonMember.address)).to.be.false;
-        });       
+        });
     });
 
     describe("Member Management", function () {
@@ -37,9 +37,9 @@ describe("HathorFederation Contract", function () {
 
         it("Should not allow non-owner to add a member", async function () {
 
-           await expect(hathorFederation.connect(nonMember).addMember(nonMember.address))
+            await expect(hathorFederation.connect(nonMember).addMember(nonMember.address))
                 .to.be.reverted;
-                  
+
         });
 
         it("Should remove an existing member", async function () {
@@ -49,6 +49,7 @@ describe("HathorFederation Contract", function () {
 
         it("Should not allow non-owner to remove a member", async function () {
             await expect(hathorFederation.connect(nonMember).removeMember(member1.address)).to.be.reverted;
+
         });
 
         it("Should not allow to remove the last member", async function () {
@@ -62,11 +63,11 @@ describe("HathorFederation Contract", function () {
 
         beforeEach(async function () {
             txData = {
-                originalTokenAddress:"0x746f6b656e733232000000000000000000000000000000000000000000000000",
+                originalTokenAddress: "0x746f6b656e733232000000000000000000000000000000000000000000000000",
                 transactionHash: "0x7478313030303030300000000000000000000000000000000000000000000000",
                 value: 1000,
                 sender: "0x73656e6465723100000000000000000000000000000000000000000000000000",
-                receiver:"0x737472696e670000000000000000000000000000000000000000000000000000",
+                receiver: "0x737472696e670000000000000000000000000000000000000000000000000000",
                 transactionType: 2, // Assuming TRANSFER
                 txHex: "0x1234"
             };
@@ -91,8 +92,8 @@ describe("HathorFederation Contract", function () {
                 txData.transactionType,
                 txData.txHex
             ))
-            .to.emit(hathorFederation, "TransactionProposed")
-            .withArgs(txId, txData.transactionHash, txData.txHex);
+                .to.emit(hathorFederation, "TransactionProposed")
+                .withArgs(txId, txData.transactionHash, txData.txHex);
 
             expect(await hathorFederation.isProposed(txId)).to.be.true;
         });
@@ -137,11 +138,11 @@ describe("HathorFederation Contract", function () {
 
         beforeEach(async function () {
             txData = {
-                originalTokenAddress:"0x746f6b656e733232000000000000000000000000000000000000000000000000",
+                originalTokenAddress: "0x746f6b656e733232000000000000000000000000000000000000000000000000",
                 transactionHash: "0x7478313030303030300000000000000000000000000000000000000000000000",
                 value: 1000,
                 sender: "0x73656e6465723100000000000000000000000000000000000000000000000000",
-                receiver:"0x737472696e670000000000000000000000000000000000000000000000000000",
+                receiver: "0x737472696e670000000000000000000000000000000000000000000000000000",
                 transactionType: 2, // Assuming TRANSFER
                 txHex: "0x1234"
             };
@@ -179,8 +180,8 @@ describe("HathorFederation Contract", function () {
                 signature,
                 true
             ))
-            .to.emit(hathorFederation, "ProposalSigned")
-            .withArgs(txId, member1.address, true, signature);
+                .to.emit(hathorFederation, "ProposalSigned")
+                .withArgs(txId, member1.address, true, signature);
 
             expect(await hathorFederation.isSigned(txId, member1.address)).to.be.true;
         });
@@ -210,9 +211,21 @@ describe("HathorFederation Contract", function () {
                 signature2,
                 true
             )).to.emit(hathorFederation, "ProposalSigned")
-              .withArgs(txId, member2.address, true, signature2);
+                .withArgs(txId, member2.address, true, signature2);
 
             expect(await hathorFederation.isSigned(txId, member2.address)).to.be.true;
+
+
+            const signatureStruct1 = await hathorFederation.transactionSignatures(txId, 0);
+            const signatureStruct2 = await hathorFederation.transactionSignatures(txId, 1);
+
+            // Log the signatures to the console
+            console.log("Signature 1:", signatureStruct1);
+            console.log("Signature 2:", signatureStruct2);
+
+
+            expect(signatureStruct1).to.equal(signature1);
+            expect(signatureStruct2).to.equal(signature2);
         });
 
 
@@ -263,11 +276,11 @@ describe("HathorFederation Contract", function () {
 
         beforeEach(async function () {
             txData = {
-                originalTokenAddress:"0x746f6b656e733232000000000000000000000000000000000000000000000000",
+                originalTokenAddress: "0x746f6b656e733232000000000000000000000000000000000000000000000000",
                 transactionHash: "0x7478313030303030300000000000000000000000000000000000000000000000",
                 value: 1000,
                 sender: "0x73656e6465723100000000000000000000000000000000000000000000000000",
-                receiver:"0x737472696e670000000000000000000000000000000000000000000000000000",
+                receiver: "0x737472696e670000000000000000000000000000000000000000000000000000",
                 transactionType: 2, // Assuming TRANSFER
                 txHex: "0x1234"
             };
@@ -302,8 +315,8 @@ describe("HathorFederation Contract", function () {
                 txData.transactionType,
                 true
             ))
-            .to.emit(hathorFederation, "ProposalSent")
-            .withArgs(txId, true);
+                .to.emit(hathorFederation, "ProposalSent")
+                .withArgs(txId, true);
 
             expect(await hathorFederation.isProcessed(txId)).to.be.true;
         });
