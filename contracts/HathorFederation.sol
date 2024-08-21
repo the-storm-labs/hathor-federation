@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract HathorFederation is Ownable {
     address private constant NULL_ADDRESS = address(0);
     uint public constant MAX_MEMBER_COUNT = 50;
+    //uint256 public signatures_required;
+
 
     address[] public members;
 
@@ -14,6 +16,7 @@ contract HathorFederation is Ownable {
         bytes signature;
     }
 
+    
     /**
 	@notice All the addresses that are members of the HathorFederation
 	@dev The address should be a member to vote in transactions
@@ -21,12 +24,13 @@ contract HathorFederation is Ownable {
 
     mapping(address => bool) public isMember;
 
-    mapping(bytes32 => mapping(address => bool)) public isSigned;
     mapping(bytes32 => bool) public isProcessed;
     mapping(bytes32 => bool) public isProposed;
     mapping(bytes32 => bytes) public transactionHex;
     mapping(bytes32 => Signatures[]) public transactionSignatures;
+    mapping(bytes32 => mapping(address => bool)) public isSigned;
 
+    
     enum TransactionType {
         MELT,
         MINT,
@@ -153,6 +157,8 @@ contract HathorFederation is Ownable {
         transactionSignatures[transactionId].push(Signatures(signature));
 
         emit ProposalSigned(transactionId, _msgSender(), signed, signature);
+
+        
     }
 
     function updateTransactionState(
