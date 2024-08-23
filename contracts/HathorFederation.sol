@@ -61,7 +61,8 @@ contract HathorFederation is Ownable {
         bytes32 receiver,
         TransactionType transactionType,
         bytes32 indexed transactionId,
-        bool processed
+        bool processed,
+        bytes32 hathorTxId
     );
 
     // Event emitted when a transaction is proposed
@@ -259,7 +260,7 @@ contract HathorFederation is Ownable {
      * @param receiver Address of the receiver
      * @param transactionType Type of the transaction (MELT, MINT, TRANSFER, RETURN)
      * @param sent Boolean indicating if the transaction has been sent
-     * @param hathorTxId Transaction ID on the Hathor network (optional)
+     * @param hathorTxId Transaction ID on the Hathor network
      */
     function updateTransactionState(
         bytes32 originalTokenAddress,
@@ -269,7 +270,7 @@ contract HathorFederation is Ownable {
         bytes32 receiver,
         TransactionType transactionType,
         bool sent,
-        bytes calldata hathorTxId
+        bytes32  hathorTxId
     ) external onlyMember {
         bytes32 transactionId = keccak256(
             abi.encodePacked(
@@ -294,7 +295,8 @@ contract HathorFederation is Ownable {
             receiver,
             transactionType,
             transactionId,
-            sent
+            sent,
+            hathorTxId
         );
     }
 

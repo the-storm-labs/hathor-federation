@@ -396,7 +396,7 @@ describe("HathorFederation Contract", function () {
         txData.receiver,
         txData.transactionType,
         true, // sent
-        "0x1232333332"
+        "0x737472696e670000000000000000000000000000000000000000000000000000"
         ))
         .to.emit(hathorFederation, "ProposalSent")
         .withArgs(
@@ -407,7 +407,8 @@ describe("HathorFederation Contract", function () {
             txData.receiver,
             txData.transactionType,
             txId,
-            true // processed
+            true,
+            "0x737472696e670000000000000000000000000000000000000000000000000000"
         );
 
     // Verify that the transaction is marked as processed
