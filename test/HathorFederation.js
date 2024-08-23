@@ -414,4 +414,122 @@ describe("HathorFederation Contract", function () {
     expect(await hathorFederation.isProcessed(txId)).to.be.true;
         
     });
+    describe("Transaction Failure Functions", function () {
+        let txData, txId;
+    
+        beforeEach(async function () {
+            txData = {
+                originalTokenAddress: "0x746f6b656e733232000000000000000000000000000000000000000000000000",
+                transactionHash: "0x7478313030303030300000000000000000000000000000000000000000000000",
+                value: 1000,
+                sender: "0x73656e6465723100000000000000000000000000000000000000000000000000",
+                receiver: "0x737472696e670000000000000000000000000000000000000000000000000000",
+                transactionType: 2, // Assuming TRANSFER
+                txHex: "0x1234"
+            };
+    
+            txId = await hathorFederation.getTransactionId(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType
+            );
+    
+            await hathorFederation.connect(member1).sendTransactionProposal(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType,
+                txData.txHex
+            );
+        });
+    
+        it("Should set a transaction as failed", async function () {
+            // Verify the initial state
+            expect(await hathorFederation.isProposed(txId)).to.be.true;
+            expect(await hathorFederation.isProcessed(txId)).to.be.false;
+    
+            // Call the function to set the transaction as failed
+            await hathorFederation.setTransactionFailed(txId);
+    
+            // Verify the state after setting as failed
+            expect(await hathorFederation.isProposed(txId)).to.be.false;
+            expect(await hathorFederation.isProcessed(txId)).to.be.false;
+        });
+    
+        it("Should not allow non-owner to set a transaction as failed", async function () {
+            // Call the function with a non-owner address
+            await expect(hathorFederation.connect(member1).setTransactionFailed(txId))
+                .to.be.reverted;
+        });
+    });
+    describe("Signature Failure Functions", function () {
+        let txData, txId;
+    
+        beforeEach(async function () {
+            txData = {
+                originalTokenAddress: "0x746f6b656e733232000000000000000000000000000000000000000000000000",
+                transactionHash: "0x7478313030303030300000000000000000000000000000000000000000000000",
+                value: 1000,
+                sender: "0x73656e6465723100000000000000000000000000000000000000000000000000",
+                receiver: "0x737472696e670000000000000000000000000000000000000000000000000000",
+                transactionType: 2, // Assuming TRANSFER
+                txHex: "0x1234"
+            };
+    
+            txId = await hathorFederation.getTransactionId(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType
+            );
+    
+            await hathorFederation.connect(member1).sendTransactionProposal(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType,
+                txData.txHex
+            );
+    
+            const signature = "0x3078646561646265656600000000000000000000000000000000000000000000";
+            await hathorFederation.connect(member1).updateSignatureState(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType,
+                signature,
+                true
+            );
+        });
+    
+        it("Should set a signature as failed", async function () {
+            // Verify the initial state
+            expect(await hathorFederation.isSigned(txId, member1.address)).to.be.true;
+    
+            // Call the function to set the signature as failed
+            await hathorFederation.setSignatureFailed(txId, member1.address);
+    
+            // Verify the state after setting as failed
+            expect(await hathorFederation.isSigned(txId, member1.address)).to.be.false;
+        });
+    
+        it("Should not allow non-owner to set a signature as failed", async function () {
+            // Call the function with a non-owner address
+            await expect(hathorFederation.connect(member1).setSignatureFailed(txId, member1.address))
+                .to.be.reverted;
+        });
+    });
+    
+    
 });
