@@ -189,14 +189,7 @@ contract HathorFederation is Ownable {
         );
     }
 
-    /**
-     * @notice Updates the signature state of a transaction
-     * @param originalTokenAddress Address of the original token
-     * @param transactionHash Hash of the transaction
-     * @param value Value of the transaction
-     * @param sender Address of the sender
-     * @param receiver Address of the receiver
-     * @param transactionType Type of the transaction (MELT, MINT, TRANS
+    
     /**
      * @notice Updates the signature state of a transaction
      * @param originalTokenAddress Address of the original token
