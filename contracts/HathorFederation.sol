@@ -3,12 +3,12 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+//update txhex and signatures
 
 contract HathorFederation is Ownable {
     address private constant NULL_ADDRESS = address(0);
     uint public constant MAX_MEMBER_COUNT = 50;
     //uint256 public signatures_required;
-
 
     address[] public members;
 
@@ -16,7 +16,6 @@ contract HathorFederation is Ownable {
         bytes signature;
     }
 
-    
     /**
 	@notice All the addresses that are members of the HathorFederation
 	@dev The address should be a member to vote in transactions
@@ -30,7 +29,6 @@ contract HathorFederation is Ownable {
     mapping(bytes32 => Signatures[]) public transactionSignatures;
     mapping(bytes32 => mapping(address => bool)) public isSigned;
 
-    
     enum TransactionType {
         MELT,
         MINT,
@@ -44,16 +42,36 @@ contract HathorFederation is Ownable {
     }
 
     event ProposalSigned(
+        bytes32 originalTokenAddress,
+        bytes32 transactionHash,
+        uint256 value,
+        bytes32 sender,
+        bytes32 receiver,
+        TransactionType transactionType,
         bytes32 indexed transactionId,
         address indexed member,
         bool signed,
         bytes signature
     );
 
-    event ProposalSent(bytes32 indexed transactionId, bool processed);
+    event ProposalSent(
+        bytes32 originalTokenAddress,
+        bytes32 transactionHash,
+        uint256 value,
+        bytes32 sender,
+        bytes32 receiver,
+        TransactionType transactionType,
+        bytes32 indexed transactionId,
+        bool processed
+    );
     event TransactionProposed(
+        bytes32 originalTokenAddress,
+        bytes32 transactionHash,
+        uint256 value,
+        bytes32 sender,
+        bytes32 receiver,
+        TransactionType transactionType,
         bytes32 transactionId,
-        bytes32 originalTransactionHash,
         bytes txHex
     );
 
@@ -124,7 +142,16 @@ contract HathorFederation is Ownable {
         );
         transactionHex[transactionId] = txHex;
         isProposed[transactionId] = true;
-        emit TransactionProposed(transactionId, transactionHash, txHex);
+        emit TransactionProposed(
+            originalTokenAddress,
+            transactionHash,
+            value,
+            sender,
+            receiver,
+            transactionType,
+            transactionId,
+            txHex
+        );
     }
 
     function updateSignatureState(
@@ -156,9 +183,18 @@ contract HathorFederation is Ownable {
         isSigned[transactionId][_msgSender()] = signed;
         transactionSignatures[transactionId].push(Signatures(signature));
 
-        emit ProposalSigned(transactionId, _msgSender(), signed, signature);
-
-        
+        emit ProposalSigned(
+            originalTokenAddress,
+            transactionHash,
+            value,
+            sender,
+            receiver,            
+            transactionType,
+            transactionId,
+            _msgSender(),
+            signed,
+            signature
+        );
     }
 
     function updateTransactionState(
@@ -168,7 +204,8 @@ contract HathorFederation is Ownable {
         bytes32 sender,
         bytes32 receiver,
         TransactionType transactionType,
-        bool sent
+        bool sent,
+        bytes calldata txId
     ) external onlyMember {
         bytes32 transactionId = keccak256(
             abi.encodePacked(
@@ -185,7 +222,15 @@ contract HathorFederation is Ownable {
             "HathorFederation: Transaction already sent"
         );
         isProcessed[transactionId] = sent;
-        emit ProposalSent(transactionId, sent);
+        emit ProposalSent(originalTokenAddress,
+            transactionHash,
+            value,
+            sender,
+            receiver,            
+            transactionType,
+            transactionId,
+            sent
+        );
     }
 
     function addMember(address _newMember) external onlyOwner {
