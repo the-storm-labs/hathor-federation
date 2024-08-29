@@ -43,8 +43,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string sender,
+        string receiver,
         TransactionType transactionType,
         bytes32 indexed transactionId,
         address indexed member,
@@ -57,8 +57,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string sender,
+        string receiver,
         TransactionType transactionType,
         bytes32 indexed transactionId,
         bool processed,
@@ -70,8 +70,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string sender,
+        string receiver,
         TransactionType transactionType,
         bytes32 transactionId,
         bytes txHex
@@ -124,8 +124,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType
     ) external pure returns (bytes32) {
         bytes32 transactionId = keccak256(
@@ -155,8 +155,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType,
         bytes memory txHex
     ) external onlyMember {
@@ -205,8 +205,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType,
         bytes memory signature,
         bool signed
@@ -259,8 +259,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType,
         bool sent,
         bytes32  hathorTxId
