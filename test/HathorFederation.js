@@ -203,7 +203,7 @@ describe("HathorFederation Contract", function () {
 
         it("Should allow a member to sign a proposed transaction", async function () {
             const signature =
-                "0x3078646561646265656600000000000000000000000000000000000000000000";
+                "03540e9ab3a4827f3110fe795308c2989055edc519840294a067f01e9652d70efe|0:3045022100d1faae47d7b105b7e8ab223715841d71c761ae85470ca74b93be1b3da39cc45f022008a8c7f001dc19728630af4de25dda8400666d0ba94781859f1ffdc1289cf84b|1:3045022100a1e9690e7b86fbca6088553f31e24e0652e97cb6c2a5a5bdfe7625271fa331110220541eb1cf9816c0ef34bfa6e4160eff48a73752efaf6b8df3c4689d276358017e";
 
             await expect(
                 hathorFederation.connect(member1).updateSignatureState(
@@ -235,7 +235,7 @@ describe("HathorFederation Contract", function () {
         });
 
         it("Should allow another member to sign the same transaction", async function () {
-            const signature1 = "0xdeadbeef";
+            const signature1 = "03540e9ab3a4827f3110fe795308c2989055edc519840294a067f01e9652d70efe|0:3045022100d1faae47d7b105b7e8ab223715841d71c761ae85470ca74b93be1b3da39cc45f022008a8c7f001dc19728630af4de25dda8400666d0ba94781859f1ffdc1289cf84b|1:3045022100a1e9690e7b86fbca6088553f31e24e0652e97cb6c2a5a5bdfe7625271fa331110220541eb1cf9816c0ef34bfa6e4160eff48a73752efaf6b8df3c4689d276358017e";
             const signature2 = "0xbeefdead";
 
             await hathorFederation.connect(member1).updateSignatureState(

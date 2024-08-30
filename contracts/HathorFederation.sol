@@ -12,7 +12,7 @@ contract HathorFederation is Ownable {
     address[] public members;  // List of members in the federation
 
     struct Signatures {
-        bytes signature;  // Holds a signature
+        string signature;  // Holds a signature
     }
 
     // Mapping to check if an address is a member
@@ -49,7 +49,7 @@ contract HathorFederation is Ownable {
         bytes32 indexed transactionId,
         address indexed member,
         bool signed,
-        bytes signature
+        string signature
     );
 
     // Event emitted when a proposal is sent
@@ -208,7 +208,7 @@ contract HathorFederation is Ownable {
         string calldata sender,
         string calldata receiver,
         TransactionType transactionType,
-        bytes memory signature,
+        string memory signature,
         bool signed
     ) external onlyMember {
         bytes32 transactionId = keccak256(
