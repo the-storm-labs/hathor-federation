@@ -531,7 +531,7 @@ describe("HathorFederation Contract", function () {
             expect(await hathorFederation.isSigned(txId, member1.address)).to.be.true;
     
             // Call the function to set the signature as failed
-            await hathorFederation.setSignatureFailed(txId, member1.address);
+            await hathorFederation.setTransactionFailed(txId);
     
             // Verify the state after setting as failed
             expect(await hathorFederation.isSigned(txId, member1.address)).to.be.false;
@@ -539,7 +539,7 @@ describe("HathorFederation Contract", function () {
     
         it("Should not allow non-owner to set a signature as failed", async function () {
             // Call the function with a non-owner address
-            await expect(hathorFederation.connect(member1).setSignatureFailed(txId, member1.address))
+            await expect(hathorFederation.connect(member1).setTransactionFailed(txId))
                 .to.be.reverted;
         });
     });

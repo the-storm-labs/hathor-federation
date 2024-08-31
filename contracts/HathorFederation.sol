@@ -339,7 +339,7 @@ contract HathorFederation is Ownable {
      * @notice Returns all current members of the federation
      * @return Current members of the federation
      */
-    function getMembers() external view returns (address[] memory) {
+    function getMembers() public view returns (address[] memory) {
         return members;
     }
 
@@ -362,17 +362,18 @@ contract HathorFederation is Ownable {
         isProcessed[transactionId] = false;
         isProposed[transactionId] = false;
         delete transactionSignatures[transactionId];
+        address[] memory _members = getMembers();
+        require(
+            _members.length <= MAX_MEMBER_COUNT,
+            "HathorFederation: Too many members"
+        );
+        
+        for (uint i = 0; i < _members.length; i++) {
+
+            isSigned[transactionId][_members[i]] = false;
+            emit SignaturaFailed(transactionId, _members[i]);
+        }
 
         emit TransactionFailed(transactionId);
-    }
-
-    /**
-     * @notice Marks a signature as failed for a specific transaction ID
-     * @param transactionId Unique identifier for the transaction
-     * @param member Address of the member whose signature failed
-     */
-    function setSignatureFailed(bytes32 transactionId, address member) external onlyOwner {
-        isSigned[transactionId][member] = false;
-        emit SignaturaFailed(transactionId, member);
-    }
+    }    
 }
