@@ -169,16 +169,16 @@ describe("HathorFederation Contract", function () {
         beforeEach(async function () {
             txData = {
                 originalTokenAddress:
-                    "0x746f6b656e733232000000000000000000000000000000000000000000000000",
+                    "0x00000000000000000000000076c6af5a264a4fa4360432e365f5a80503476415",
                 transactionHash:
-                    "0x7478313030303030300000000000000000000000000000000000000000000000",
-                value: 1000,
+                    "0x2336a2c4c79a4343392233ea209fede3c48c8531a6d6af5975c6363c4559d38a",
+                value: "1000000000000000000",
                 sender:
-                    "0x73656e6465723100000000000000000000000000000000000000000000000000",
+                    "0xCC3CF44397Daa4572CDb20f72dee5700507454E4",
                 receiver:
-                    "0x737472696e670000000000000000000000000000000000000000000000000000",
-                transactionType: 2, // Assuming TRANSFER
-                txHex: "0x1234",
+                    "WjDz74uofMpF87xy9F9F1HYs9rjU6vY8Gr",
+                transactionType: 1, // Assuming TRANSFER
+                txHex: "0x000101020200000d22ea79269e96b4797dc9fa8ac0d261fce7c3b55a23866a74d74eb828d2000000008a5dde956781005a46c585af223fbf4b411b89db26a926ecb7aee2ec02000000000b135b3728d481627da9a0e76b217001f9fd7c665b5bcc20451ce6cccad60100000000006401001976a914e16d82e4b91356d33f22566337a594b7078590e488ac00000001810017a91468a9f4f1fdcf0c1bf958100d16c62c0ac3411aed874030c8ec92a90b1f66d23e5e0000000000",
             };
 
             txId = await hathorFederation.getTransactionId(
@@ -202,8 +202,7 @@ describe("HathorFederation Contract", function () {
         });
 
         it("Should allow a member to sign a proposed transaction", async function () {
-            const signature =
-                "03540e9ab3a4827f3110fe795308c2989055edc519840294a067f01e9652d70efe|0:3045022100d1faae47d7b105b7e8ab223715841d71c761ae85470ca74b93be1b3da39cc45f022008a8c7f001dc19728630af4de25dda8400666d0ba94781859f1ffdc1289cf84b|1:3045022100a1e9690e7b86fbca6088553f31e24e0652e97cb6c2a5a5bdfe7625271fa331110220541eb1cf9816c0ef34bfa6e4160eff48a73752efaf6b8df3c4689d276358017e";
+            const signature ="03540e9ab3a4827f3110fe795308c2989055edc519840294a067f01e9652d70efe|0:3045022100d1faae47d7b105b7e8ab223715841d71c761ae85470ca74b93be1b3da39cc45f022008a8c7f001dc19728630af4de25dda8400666d0ba94781859f1ffdc1289cf84b|1:3045022100a1e9690e7b86fbca6088553f31e24e0652e97cb6c2a5a5bdfe7625271fa331110220541eb1cf9816c0ef34bfa6e4160eff48a73752efaf6b8df3c4689d276358017e";
 
             await expect(
                 hathorFederation.connect(member1).updateSignatureState(
@@ -447,12 +446,24 @@ describe("HathorFederation Contract", function () {
                 txData.transactionType,
                 txData.txHex
             );
+            const signature = "0x3078646561646265656600000000000000000000000000000000000000000000";
+            await hathorFederation.connect(member1).updateSignatureState(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType,
+                signature,
+                true
+            );
         });
     
         it("Should set a transaction as failed", async function () {
             // Verify the initial state
             expect(await hathorFederation.isProposed(txId)).to.be.true;
             expect(await hathorFederation.isProcessed(txId)).to.be.false;
+            expect(await hathorFederation.getSignatureCount(txId)).to.be.equal(1)
     
             // Call the function to set the transaction as failed
             await hathorFederation.setTransactionFailed(txId);
@@ -460,6 +471,7 @@ describe("HathorFederation Contract", function () {
             // Verify the state after setting as failed
             expect(await hathorFederation.isProposed(txId)).to.be.false;
             expect(await hathorFederation.isProcessed(txId)).to.be.false;
+            expect(await hathorFederation.getSignatureCount(txId)).to.be.equal(0)
         });
     
         it("Should not allow non-owner to set a transaction as failed", async function () {

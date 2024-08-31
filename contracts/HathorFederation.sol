@@ -361,6 +361,7 @@ contract HathorFederation is Ownable {
     function setTransactionFailed(bytes32 transactionId) external onlyOwner {
         isProcessed[transactionId] = false;
         isProposed[transactionId] = false;
+        delete transactionSignatures[transactionId];
 
         emit TransactionFailed(transactionId);
     }
@@ -372,7 +373,6 @@ contract HathorFederation is Ownable {
      */
     function setSignatureFailed(bytes32 transactionId, address member) external onlyOwner {
         isSigned[transactionId][member] = false;
-
         emit SignaturaFailed(transactionId, member);
     }
 }
