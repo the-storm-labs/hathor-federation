@@ -90,7 +90,7 @@ contract HathorFederation is Ownable {
         string sender,
         string receiver,
         TransactionType transactionType,
-        bytes32 indexed transactionId,);
+        bytes32 indexed transactionId);
 
     // Event emitted when a signature fails
     event SignaturaFailed(bytes32 indexed transactionId, address member);
@@ -168,10 +168,10 @@ contract HathorFederation is Ownable {
     ) external onlyMember {
         bytes32 transactionId = getTransactionId(
                 originalTokenAddress,
-                sender,
-                receiver,
-                value,
                 transactionHash,
+                value,
+                sender,
+                receiver,               
                 transactionType
         );
 
@@ -217,10 +217,10 @@ contract HathorFederation is Ownable {
     ) external onlyMember {
         bytes32 transactionId = getTransactionId(
                 originalTokenAddress,
-                sender,
-                receiver,
-                value,
                 transactionHash,
+                value,
+                sender,
+                receiver,               
                 transactionType
         );
 
@@ -269,12 +269,13 @@ contract HathorFederation is Ownable {
     ) external onlyMember {
         bytes32 transactionId = getTransactionId(
                 originalTokenAddress,
-                sender,
-                receiver,
-                value,
                 transactionHash,
+                value,
+                sender,
+                receiver,               
                 transactionType
         );
+
         require(
             isProcessed[transactionId] == false,
             "HathorFederation: Transaction already sent"
