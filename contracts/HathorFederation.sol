@@ -12,7 +12,7 @@ contract HathorFederation is Ownable {
     address[] public members;  // List of members in the federation
 
     struct Signatures {
-        bytes signature;  // Holds a signature
+        string signature;  // Holds a signature
     }
 
     // Mapping to check if an address is a member
@@ -43,13 +43,13 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string sender,
+        string receiver,
         TransactionType transactionType,
         bytes32 indexed transactionId,
         address indexed member,
         bool signed,
-        bytes signature
+        string signature
     );
 
     // Event emitted when a proposal is sent
@@ -57,8 +57,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string sender,
+        string receiver,
         TransactionType transactionType,
         bytes32 indexed transactionId,
         bool processed,
@@ -70,8 +70,8 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string sender,
+        string receiver,
         TransactionType transactionType,
         bytes32 transactionId,
         bytes txHex
@@ -84,7 +84,13 @@ contract HathorFederation is Ownable {
     event MemberRemoval(address indexed member);
 
     // Event emitted when a transaction fails
-    event TransactionFailed(bytes32 indexed transactionId);
+    event TransactionFailed(bytes32 originalTokenAddress,
+        bytes32 transactionHash,
+        uint256 value,
+        string sender,
+        string receiver,
+        TransactionType transactionType,
+        bytes32 indexed transactionId);
 
     // Event emitted when a signature fails
     event SignaturaFailed(bytes32 indexed transactionId, address member);
@@ -124,10 +130,10 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType
-    ) external pure returns (bytes32) {
+    ) public pure returns (bytes32) {
         bytes32 transactionId = keccak256(
             abi.encodePacked(
                 originalTokenAddress,
@@ -155,20 +161,18 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType,
         bytes memory txHex
     ) external onlyMember {
-        bytes32 transactionId = keccak256(
-            abi.encodePacked(
+        bytes32 transactionId = getTransactionId(
                 originalTokenAddress,
-                sender,
-                receiver,
-                value,
                 transactionHash,
+                value,
+                sender,
+                receiver,               
                 transactionType
-            )
         );
 
         require(
@@ -205,21 +209,19 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType,
-        bytes memory signature,
+        string memory signature,
         bool signed
     ) external onlyMember {
-        bytes32 transactionId = keccak256(
-            abi.encodePacked(
+        bytes32 transactionId = getTransactionId(
                 originalTokenAddress,
-                sender,
-                receiver,
-                value,
                 transactionHash,
+                value,
+                sender,
+                receiver,               
                 transactionType
-            )
         );
 
         require(
@@ -259,22 +261,21 @@ contract HathorFederation is Ownable {
         bytes32 originalTokenAddress,
         bytes32 transactionHash,
         uint256 value,
-        bytes32 sender,
-        bytes32 receiver,
+        string calldata sender,
+        string calldata receiver,
         TransactionType transactionType,
         bool sent,
         bytes32  hathorTxId
     ) external onlyMember {
-        bytes32 transactionId = keccak256(
-            abi.encodePacked(
+        bytes32 transactionId = getTransactionId(
                 originalTokenAddress,
-                sender,
-                receiver,
-                value,
                 transactionHash,
+                value,
+                sender,
+                receiver,               
                 transactionType
-            )
         );
+
         require(
             isProcessed[transactionId] == false,
             "HathorFederation: Transaction already sent"
@@ -339,7 +340,7 @@ contract HathorFederation is Ownable {
      * @notice Returns all current members of the federation
      * @return Current members of the federation
      */
-    function getMembers() external view returns (address[] memory) {
+    function getMembers() public view returns (address[] memory) {
         return members;
     }
 
@@ -356,23 +357,38 @@ contract HathorFederation is Ownable {
 
     /**
      * @notice Marks a transaction as failed and resets its state
-     * @param transactionId Unique identifier for the transaction
+     * @param originalTokenAddress Address of the original token
+     * @param transactionHash Hash of the transaction
+     * @param value Value of the transaction
+     * @param sender Address of the sender
+     * @param receiver Address of the receiver
+     * @param transactionType Type of the transaction (MELT, MINT, TRANSFER, RETURN)    
      */
-    function setTransactionFailed(bytes32 transactionId) external onlyOwner {
+    function setTransactionFailed( 
+        bytes32 originalTokenAddress,
+        bytes32 transactionHash,
+        uint256 value,
+        string calldata sender,
+        string calldata receiver,
+        TransactionType transactionType) external onlyOwner {
+
+        bytes32 transactionId = getTransactionId(originalTokenAddress, transactionHash, value, sender, receiver, transactionType);  
+        
         isProcessed[transactionId] = false;
         isProposed[transactionId] = false;
+        delete transactionSignatures[transactionId];
+        address[] memory _members = getMembers();
+        require(
+            _members.length <= MAX_MEMBER_COUNT,
+            "HathorFederation: Too many members"
+        );
+        
+        for (uint i = 0; i < _members.length; i++) {
 
-        emit TransactionFailed(transactionId);
-    }
+            isSigned[transactionId][_members[i]] = false;
+            emit SignaturaFailed(transactionId, _members[i]);
+        }
 
-    /**
-     * @notice Marks a signature as failed for a specific transaction ID
-     * @param transactionId Unique identifier for the transaction
-     * @param member Address of the member whose signature failed
-     */
-    function setSignatureFailed(bytes32 transactionId, address member) external onlyOwner {
-        isSigned[transactionId][member] = false;
-
-        emit SignaturaFailed(transactionId, member);
-    }
+        emit TransactionFailed(originalTokenAddress, transactionHash, value, sender, receiver, transactionType, transactionId);
+    }    
 }

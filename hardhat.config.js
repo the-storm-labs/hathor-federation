@@ -22,6 +22,13 @@ module.exports = {
         mnemonic: MNEMONIC,
       }
     }
-  } 
-};
+  },
+   
+  settings: {
+    optimizer: {
+      enabled: true,
+      runs: 1000,
+    },
+  }
+} 
 
