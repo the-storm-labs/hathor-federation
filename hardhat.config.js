@@ -21,6 +21,30 @@ module.exports = {
       accounts: {
         mnemonic: MNEMONIC,
       }
+    },
+    arbitrum_sepolia: {
+      live: false,
+      url: 'https://arbitrum-sepolia.infura.io/v3/' + INFURA_PROJECT_ID,
+      network_id: 421614,
+      token_symbol: 'p',
+      gas: 6700000,
+      gasPrice: 160000000000,
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
+      tags: ['staging'],
+    }, 
+    amoy: {
+      live: false,
+      url: 'https://polygon-amoy.infura.io/v3/' + INFURA_PROJECT_ID,
+      network_id: 80002,
+      token_symbol: 'p',
+      gas: 6700000,
+      gasPrice: 160000000000,
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
+      tags: ['staging'],
     }
   },
    
