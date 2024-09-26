@@ -76,6 +76,10 @@ contract HathorFederation is Ownable {
         bytes32 transactionId,
         bytes txHex
     );
+    //Event emitted to lock txHEX
+    event LockTransactionHex(
+        bytes txHex
+    );
 
     // Event emitted when a new member is added
     event MemberAddition(address indexed member);
@@ -191,6 +195,8 @@ contract HathorFederation is Ownable {
             transactionId,
             txHex
         );
+
+        emit LockTransactionHex(txHex);
     }
 
     
@@ -390,5 +396,5 @@ contract HathorFederation is Ownable {
         }
 
         emit TransactionFailed(originalTokenAddress, transactionHash, value, sender, receiver, transactionType, transactionId);
-    }    
-}
+    }   
+   }
