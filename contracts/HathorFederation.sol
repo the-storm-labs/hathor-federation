@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 // HathorFederation contract: Manages transaction proposals, voting, and member management
 contract HathorFederation is Ownable {
+    
     address private constant NULL_ADDRESS = address(0);
     uint public constant MAX_MEMBER_COUNT = 50;
 
@@ -310,7 +311,10 @@ contract HathorFederation is Ownable {
             !isMember[_newMember],
             "HathorFederation: Member already exists"
         );
-
+         require(
+            members.length < MAX_MEMBER_COUNT,
+            "HathorFederation: Too many members"
+        );
         isMember[_newMember] = true;
         members.push(_newMember);
         emit MemberAddition(_newMember);
