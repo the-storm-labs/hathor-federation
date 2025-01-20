@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.24;
+pragma solidity 0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 // HathorFederation contract: Manages transaction proposals, voting, and member management
 contract HathorFederation is Ownable {
+    
     address private constant NULL_ADDRESS = address(0);
     uint public constant MAX_MEMBER_COUNT = 50;
 
@@ -24,6 +25,7 @@ contract HathorFederation is Ownable {
     mapping(bytes32 => bytes) public transactionHex; // Stores the hex representation of transactions
     mapping(bytes32 => Signatures[]) public transactionSignatures; // Stores signatures for transactions
     mapping(bytes32 => mapping(address => bool)) public isSigned; // Checks if a member has signed a transaction
+    
 
     enum TransactionType {
         MELT,
@@ -287,6 +289,7 @@ contract HathorFederation is Ownable {
             "HathorFederation: Transaction already sent"
         );
         isProcessed[transactionId] = sent;
+               
         emit ProposalSent(
             originalTokenAddress,
             transactionHash,
@@ -310,7 +313,10 @@ contract HathorFederation is Ownable {
             !isMember[_newMember],
             "HathorFederation: Member already exists"
         );
-
+         require(
+            members.length < MAX_MEMBER_COUNT,
+            "HathorFederation: Too many members"
+        );
         isMember[_newMember] = true;
         members.push(_newMember);
         emit MemberAddition(_newMember);
@@ -379,7 +385,7 @@ contract HathorFederation is Ownable {
         TransactionType transactionType) external onlyOwner {
 
         bytes32 transactionId = getTransactionId(originalTokenAddress, transactionHash, value, sender, receiver, transactionType);  
-        
+        require(!isProcessed[transactionId], "HathorFederation: Transaction already sent");
         isProcessed[transactionId] = false;
         isProposed[transactionId] = false;
         delete transactionSignatures[transactionId];
