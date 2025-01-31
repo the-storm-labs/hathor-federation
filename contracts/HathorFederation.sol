@@ -25,7 +25,8 @@ contract HathorFederation is Ownable {
     mapping(bytes32 => bytes) public transactionHex; // Stores the hex representation of transactions
     mapping(bytes32 => Signatures[]) public transactionSignatures; // Stores signatures for transactions
     mapping(bytes32 => mapping(address => bool)) public isSigned; // Checks if a member has signed a transaction
-    
+    mapping (bytes32 => bool) public transactionsFailed; //map failed transactions
+
 
     enum TransactionType {
         MELT,
@@ -275,6 +276,7 @@ contract HathorFederation is Ownable {
         bool sent,
         bytes32  hathorTxId
     ) external onlyMember {
+        
         bytes32 transactionId = getTransactionId(
                 originalTokenAddress,
                 transactionHash,
@@ -288,7 +290,13 @@ contract HathorFederation is Ownable {
             isProcessed[transactionId] == false,
             "HathorFederation: Transaction already sent"
         );
-        isProcessed[transactionId] = sent;
+        
+        if (!sent){
+        transactionsFailed[transactionId] = true;
+        }
+        
+        isProcessed[transactionId] = true;
+
                
         emit ProposalSent(
             originalTokenAddress,
@@ -385,9 +393,10 @@ contract HathorFederation is Ownable {
         TransactionType transactionType) external onlyOwner {
 
         bytes32 transactionId = getTransactionId(originalTokenAddress, transactionHash, value, sender, receiver, transactionType);  
-        require(!isProcessed[transactionId], "HathorFederation: Transaction already sent");
+        require(transactionsFailed[transactionId], "HathorFederation: Transaction already sent");
         isProcessed[transactionId] = false;
         isProposed[transactionId] = false;
+        transactionsFailed[transactionId] =false ;
         delete transactionSignatures[transactionId];
         address[] memory _members = getMembers();
         require(

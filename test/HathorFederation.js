@@ -447,6 +447,7 @@ describe("HathorFederation Contract", function () {
                 txData.txHex
             );
             const signature = "0x3078646561646265656600000000000000000000000000000000000000000000";
+
             await hathorFederation.connect(member1).updateSignatureState(
                 txData.originalTokenAddress,
                 txData.transactionHash,
@@ -457,12 +458,37 @@ describe("HathorFederation Contract", function () {
                 signature,
                 true
             );
-        });
-    
+
+            await expect(hathorFederation.connect(member1).updateTransactionState(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType,
+                false, // sent
+                "0x737472696e670000000000000000000000000000000000000000000000000000"
+                ))
+                .to.emit(hathorFederation, "ProposalSent")
+                .withArgs(
+                    txData.originalTokenAddress,
+                    txData.transactionHash,
+                    txData.value,
+                    txData.sender,
+                    txData.receiver,
+                    txData.transactionType,
+                    txId,
+                    false,
+                    "0x737472696e670000000000000000000000000000000000000000000000000000"
+                );
+            
+     });
         it("Should set a transaction as failed", async function () {
-            // Verify the initial state
+            // Verify the initial state  
+
+            console.log (await hathorFederation.transactionsFailed(txId));
             expect(await hathorFederation.isProposed(txId)).to.be.true;
-            expect(await hathorFederation.isProcessed(txId)).to.be.false;
+            expect(await hathorFederation.isProcessed(txId)).to.be.true;
             expect(await hathorFederation.getSignatureCount(txId)).to.be.equal(1)
     
             // Call the function to set the transaction as failed
@@ -532,8 +558,30 @@ describe("HathorFederation Contract", function () {
                 txData.receiver,
                 txData.transactionType,
                 signature,
-                true
+                "0x3078646561646265656600000000000000000000000000000000000000000000"
             );
+            await expect(hathorFederation.connect(member1).updateTransactionState(
+                txData.originalTokenAddress,
+                txData.transactionHash,
+                txData.value,
+                txData.sender,
+                txData.receiver,
+                txData.transactionType,
+                false, // sent
+                "0x737472696e670000000000000000000000000000000000000000000000000000"
+                ))
+                .to.emit(hathorFederation, "ProposalSent")
+                .withArgs(
+                    txData.originalTokenAddress,
+                    txData.transactionHash,
+                    txData.value,
+                    txData.sender,
+                    txData.receiver,
+                    txData.transactionType,
+                    txId,
+                    false,
+                    "0x737472696e670000000000000000000000000000000000000000000000000000"
+                );
         });
     
         it("Should set a signature as failed", async function () {
